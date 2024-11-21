@@ -1,5 +1,6 @@
 import os
 import wfdb
+import openpyxl
 import numpy as np
 from scipy.signal import welch
 import matplotlib.pyplot as plt
@@ -7,12 +8,14 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-from sklearn.metrics import roc_curve, auc, classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
+import pandas as pd
 import seaborn as sns
-# from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
-def carrega_dados_mitbih(val):
+######################### Carregamento dos Dados #########################
+def carrega_dados_mitbih(ini, fim):
     """
     Carrega os dados do banco de dados MIT-BIH e extrai segmentos de sinais.
 
@@ -23,14 +26,12 @@ def carrega_dados_mitbih(val):
 
     x1 = []
     y1 = []
+    casos = None
 
-    # Caminho para a pasta onde os arquivos do MIT-BIH estão localizados
-    pasta = r'C:\Users\cydyq\Documents\Python\TCC\mitdb'
-
-        records = [f[:-4] for f in os.listdir(pasta) if f.endswith('.dat')]
-
+    records = ['100', '101', '102']
     for index, record in enumerate(records):
-        print(f'Modelo atual[{index + 1}]: Record {record} de {len(records) - index} arquivos')
+        casos = index  + 1
+        print(f"Processando registro {casos}: {record}")
 
         # Carrega o sinal e as anotações do registro
         signals, fields = wfdb.rdsamp(record, pn_dir='mitdb/1.0.0')
@@ -47,9 +48,16 @@ def carrega_dados_mitbih(val):
                 x1.append(segment)
                 y1.append(beat_type)
 
+    if casos:
+        print(f'Exames analisados: {casos}')
+
     return np.array(x1), np.array(y1)
+"""
+Carregamento dos Dados: Lê os dados de ECG do banco de dados MIT-BIH.
+"""
+X, y = carrega_dados_mitbih(100, 102)
 
-
+######################### Pré-processamento dos Dados #########################
 def extract_features(signals):
     """
     Extrai características do sinal de ECG.
@@ -62,51 +70,128 @@ def extract_features(signals):
     """
 
     features = []
-
     # Características estatísticas
     features.extend([np.mean(signals), np.std(signals), np.max(signals), np.min(signals), np.median(signals)])
 
     # Características baseadas em frequência (utilizando o metodo de Welch)
-    freqs, power = welch(signals, fs=360)  # Assumindo frequência de amostragem de 360 Hz
+    freqs, power = welch(signals, fs=360)
     features.extend([np.max(power), np.mean(power), np.argmax(power)])
 
+    """
     # Outras características (exemplos):
     # - Entropia de Shannon
     # - Fractal dimension
     # - Coeficientes de wavelet
-    # - ...
+    # - ..."""
 
     return np.array(features)
 
-
-# Carregando os dados de todos os arquivos disponíveis
-val1 = 10
-X, y = carrega_dados_mitbih(val1)
-
-# Extraindo as características
+"""
+Extração de Características: Calcula características relevantes dos sinais de ECG, 
+como estatísticas e características de frequência.
+"""
 X_features = []
 for signal in X:
     X_features.append(extract_features(signal))
 X_features = np.array(X_features)
 
-# Selecionando as 10 características mais relevantes utilizando o teste F
-selector = SelectKBest(f_classif, k=10)
+"""
+Seleção de Características: Seleciona as características mais importantes para a classificação, 
+utilizando o método SelectKBest.
+"""
+selector = SelectKBest(f_classif, k='all')
 X_new = selector.fit_transform(X_features, y)
 
-# Dividindo os dados em treino e teste
+######################### Treinamento do Modelo #########################
+"""
+Divisão dos Dados: Divide os dados em conjuntos de treinamento e teste.
+"""
 X_train, X_test, y_train, y_test = train_test_split(X_new, y, test_size=0.2, random_state=42)
 
-# Criando e treinando o modelo
+"""
+Treinamento: Treina um modelo de Support Vector Machine (SVM) para classificar 
+os sinais de ECG como normais ou anormais com base nas características selecionadas.
+"""
 model = SVC(kernel='rbf', C=1.0, gamma='scale', probability=True)
 model.fit(X_train, y_train)
 
-# Fazendo previsões e avaliando o modelo
+######################### Avaliação do Modelo #########################
+"""
+Predição: Utiliza o modelo treinado para fazer previsões sobre os dados de teste.
+"""
 y_pred = model.predict(X_test)
 
-######################### CURVA ROC #########################
+"""
+Métricas de Desempenho: Calcula diversas métricas, como acurácia, precisão, recall e
+F1-score, para avaliar a qualidade das previsões.
+"""
+acuracia = accuracy_score(y_test, y_pred) if accuracy_score(y_test, y_pred) == '0' else '1'
+precisao = precision_score(y_test, y_pred) if precision_score(y_test, y_pred) != '0' else '1'
+recall = recall_score(y_test, y_pred) if recall_score(y_test, y_pred) != '0' else '1'
+f1 = f1_score(y_test, y_pred) if f1_score(y_test, y_pred) != '0' else '1'
+print(f'Acurácia: {acuracia} \nPrecisao: {precisao} \nRecall: {recall} \nF1: {f1}\n')
+
+# Criando um DataFrame com as métricas
+metricas = pd.DataFrame({'Metrica': ['Acuracia', 'Precisao', 'Recall', 'F1-Score'],
+                         'Valor': [acuracia, precisao, recall, f1]})
+
+"""
+Matriz de Confusão: Visualiza a distribuição das previsões corretas e incorretas para cada classe.
+"""
 sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d')
 plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.title('Confusion Matrix')
-print('Mostrando Matriz de confusão linha 121')
-plt.show()
+plt.savefig('matriz_confusao.png')
+
+"""
+Curva ROC: Avalia o poder de discriminação do modelo, mostrando a 
+relação entre a taxa de verdadeiros positivos e a taxa de falsos positivos.
+"""
+y_prob = model.predict_proba(X_test)[:, 1]
+fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+roc_auc = auc(fpr, tpr)
+
+plt.plot(fpr, tpr, color='darkorange', label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic')
+plt.legend(loc="lower right")
+plt.savefig('curva_roc.png')
+
+"""
+Importância das Features: Identifica quais características contribuem mais para a classificação.
+"""
+importances = selector.scores_
+indices = np.argsort(importances)[::-1]
+
+# Plotando a importância das features
+plt.figure(figsize=(12, 6))
+plt.title("Feature Importance")
+plt.bar(range(X_new.shape[1]), importances[indices], color="r", align="center")
+plt.xticks(range(X_new.shape[1]), indices)
+plt.xlim([-1, X_new.shape[1]])
+plt.savefig('importancia_features.png')
+
+"""
+Relatório de Classificação: Gera um relatório detalhado com todas as
+métricas de desempenho, incluindo suporte, confiança e macro/micro médias.
+"""
+# Relatório de classificação em formato de string
+report_str = classification_report(y_test, y_pred, output_dict=True)
+
+# Convertendo o dicionário para DataFrame
+classificacao = pd.DataFrame(report_str).transpose()
+
+# Convertendo os valores para porcentagem e formatando
+classificacao = classificacao.map(lambda x: '{:.2f}%'.format(x*100))
+
+# Salvando os resultados em um único arquivo Excel
+with pd.ExcelWriter('relatorio_final.xlsx', engine='openpyxl') as writer:
+    metricas.to_excel(writer, sheet_name='Métricas')
+    classificacao.to_excel(writer, sheet_name='Relatório de Classificação')
+
+print('Resultados salvos em relatorio_final.xlsx')

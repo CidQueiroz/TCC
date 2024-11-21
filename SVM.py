@@ -87,7 +87,7 @@ def extract_features(signals):
 """
 Carregamento dos Dados: Lê os dados de ECG do banco de dados MIT-BIH.
 """
-val1 = 1
+val1 = 100
 X, y = carrega_dados_mitbih(val1)
 
 ######################### Pré-processamento dos Dados #########################
