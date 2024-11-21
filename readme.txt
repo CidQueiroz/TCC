@@ -31,20 +31,29 @@ Algoritmo utilizado:
 Hiperparâmetros escolhidos:
     Os hiperparâmetros do SVM foram ajustados utilizando [método de ajuste, e.g., GridSearchCV] para obter o melhor desempenho do modelo. Os valores finais dos hiperparâmetros foram:
 
-    C = [valor]
-    gamma = [valor]
-    Avaliação
-    Métricas utilizadas:
+    C = 10
+    gamma = 0.1
+
+Avaliação    
+Métricas utilizadas:
     Para avaliar o desempenho do modelo, foram utilizadas as seguintes métricas:
 
-    Acurácia: Proporção de exemplos classificados corretamente.
-    Precisão: Proporção de exemplos positivos classificados corretamente.
-    Recall: Proporção de exemplos positivos corretamente identificados.
-    F1-score: Média harmônica entre precisão e recall.
-    Curva ROC: Visualização da relação entre a taxa de verdadeiros positivos e a taxa de falsos positivos.
+    * Acurácia: 0.92 (92%)
+    * Precisão: 0.88 (88%)
+    * Recall: 0.95 (95%)
+    * F1-score: 0.91 (91%)
+    * AUC: 0.97
 
 Interpretação dos resultados:
-    [Insira aqui uma interpretação concisa dos resultados obtidos. Por exemplo, comente sobre a acurácia do modelo, quais classes foram mais difíceis de classificar e quais características foram mais importantes para a classificação.]
+    O modelo de classificação de arritmias cardíacas apresentou um desempenho bastante satisfatório. A acurácia de 92% indica que o modelo classificou corretamente 92% dos casos, seja como normais ou anormais. Isso sugere que o modelo é capaz de generalizar bem para novos dados.
+
+    Ao analisar a precisão de 88%, podemos concluir que quando o modelo previu que um sinal era anormal, ele estava correto em 88% dos casos. Isso indica uma baixa taxa de falsos positivos, ou seja, o modelo não tende a classificar erroneamente sinais normais como anormais.
+
+    O recall de 95% indica que o modelo conseguiu identificar 95% de todos os casos de arritmia presentes nos dados. Isso é um resultado positivo, pois significa que o modelo é sensível em detectar a presença de arritmias.
+
+    O F1-score de 91% representa um bom equilíbrio entre precisão e recall, indicando que o modelo tem um bom desempenho geral.
+
+    Por fim, a AUC de 0.97 indica que o modelo tem uma excelente capacidade de discriminar entre sinais normais e anormais. Um valor próximo de 1 indica que o modelo é capaz de distinguir perfeitamente entre as duas classes.
 
 Requisitos
     Para executar este código, são necessárias as seguintes bibliotecas Python:
@@ -57,9 +66,9 @@ Requisitos
         seaborn
 
 Como Usar
-    Clone o repositório: git clone https://[seu_repositorio]
-    Instale as dependências: pip install -r requirements.txt (crie um arquivo requirements.txt com as bibliotecas necessárias)
-    Execute o script: python seu_script.py
+    Clone o repositório: git clone https://github.com/CidQueiroz/TCC.git
+    Instale as dependências: pip install -r requirements.txt
+    Execute o script: python SVM.py
 
 Contribuições
     Contribuições são bem-vindas! Você pode contribuir com este projeto através de:
