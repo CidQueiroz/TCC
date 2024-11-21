@@ -27,15 +27,13 @@ def carrega_dados_mitbih(ini, fim):
     x1 = []
     y1 = []
     casos = None
-
-    records = ['100', '101', '102']
-    for index, record in enumerate(records):
+    for index, record in enumerate(range(100, fim+1)):
         casos = index  + 1
         print(f"Processando registro {casos}: {record}")
 
         # Carrega o sinal e as anotações do registro
-        signals, fields = wfdb.rdsamp(record, pn_dir='mitdb/1.0.0')
-        annotations = wfdb.rdann(record, 'atr', pn_dir='mitdb/1.0.0')
+        signals, fields = wfdb.rdsamp(str(record), pn_dir='mitdb/1.0.0')
+        annotations = wfdb.rdann(str(record), 'atr', pn_dir='mitdb/1.0.0')
 
         # Extrai segmentos do sinal e as respectivas classes
         for i in range(0, len(signals) - 1000, 1000):
@@ -55,7 +53,7 @@ def carrega_dados_mitbih(ini, fim):
 """
 Carregamento dos Dados: Lê os dados de ECG do banco de dados MIT-BIH.
 """
-X, y = carrega_dados_mitbih(100, 102)
+X, y = carrega_dados_mitbih(100, 104)
 
 ######################### Pré-processamento dos Dados #########################
 def extract_features(signals):
