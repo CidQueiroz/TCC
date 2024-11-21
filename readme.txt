@@ -1,6 +1,3 @@
-PEIDO AMARELO
-
-
 Classificação de Arritmias Cardíacas utilizando SVM e o Banco de Dados MIT-BIH
 
 Introdução
