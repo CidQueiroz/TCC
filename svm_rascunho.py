@@ -191,7 +191,7 @@ classificacao = classificacao.map(lambda x: '{:.2f}%'.format(x*100))
 
 # Salvando os resultados em um único arquivo Excel
 with pd.ExcelWriter('relatorio_final.xlsx', engine='openpyxl') as writer:
-    metricas.to_excel(writer, sheet_name='Métricas')
+    metricas.to_excel(writer, sheet_name='Métricas', index=False)
     classificacao.to_excel(writer, sheet_name='Relatório de Classificação')
-
+    
 print('Resultados salvos em relatorio_final.xlsx')
