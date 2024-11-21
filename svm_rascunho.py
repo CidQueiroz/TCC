@@ -1,7 +1,6 @@
 import os
 import wfdb
 import numpy as np
-# import pandas as pd
 from scipy.signal import welch
 import matplotlib.pyplot as plt
 from sklearn.feature_selection import SelectKBest
@@ -28,9 +27,6 @@ def carrega_dados_mitbih(val):
     # Caminho para a pasta onde os arquivos do MIT-BIH estão localizados
     pasta = r'C:\Users\cydyq\Documents\Python\TCC\mitdb'
 
-    if val == 1:
-        records = ['100']
-    else:
         records = [f[:-4] for f in os.listdir(pasta) if f.endswith('.dat')]
 
     for index, record in enumerate(records):
