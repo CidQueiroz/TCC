@@ -1,4 +1,6 @@
+import os
 import wfdb
+import openpyxl
 import numpy as np
 from scipy.signal import welch
 import matplotlib.pyplot as plt
@@ -7,6 +9,8 @@ from sklearn.feature_selection import f_classif
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
+import pandas as pd
+import seaborn as sns
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
@@ -49,7 +53,7 @@ def carrega_dados_mitbih(ini, fim):
 """
 Carregamento dos Dados: Lê os dados de ECG do banco de dados MIT-BIH.
 """
-X, y = carrega_dados_mitbih(100, 203)
+X, y = carrega_dados_mitbih(100, 109)
 
 ######################### Pré-processamento dos Dados #########################
 def extract_features(signals):
