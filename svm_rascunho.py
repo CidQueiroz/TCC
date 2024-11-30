@@ -53,7 +53,7 @@ def carrega_dados_mitbih(ini, fim):
 """
 Carregamento dos Dados: Lê os dados de ECG do banco de dados MIT-BIH.
 """
-X, y = carrega_dados_mitbih(100, 104)
+X, y = carrega_dados_mitbih(100, 109)
 
 ######################### Pré-processamento dos Dados #########################
 def extract_features(signals):

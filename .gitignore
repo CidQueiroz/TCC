@@ -1,7 +1,9 @@
-Atividade4.docx
 metricas.xlsx
 relatorio_classificacao.xlsx
 gemini.txt
 svm_rascunho.py
 .vscode/
 .idea/
+.arquivos/
+pag_svm.py
+reportlab2.py
