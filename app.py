@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import wfdb
 import datetime
 import numpy as np
@@ -32,9 +33,8 @@ def carrega_e_processa_dados(ini, fim):
             annotations = wfdb.rdann(str(record), 'atr', pn_dir='mitdb/1.0.0')
 
             for i in range(0, len(signals) - 1000, 1000):
-                segment = signals[i:i + 1000, 0]  # Seleciona o primeiro canal
-                ann_idx = np.where((annotations.sample >= i) &
-                                (annotations.sample < i + 1000))[0]
+                segment = signals[i:i + 1000, 0]
+                ann_idx = np.where((annotations.sample >= i) & (annotations.sample < i + 1000))[0]
 
                 if len(ann_idx) > 0:
                     beat_type = 1 if annotations.symbol[ann_idx[0]] != 'N' else 0
